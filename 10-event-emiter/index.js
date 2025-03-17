@@ -1,0 +1,1 @@
+console.log('10-event-emiter/index.js');
