@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat app</title>
+</head>
+<body>
+    <div id="user-list">
+        <h3> online users </h3>
+        <ul id="users"></ul>
+    </div>
+    <div id="chat"></div>
+        <form id="chat-form">
+            <input type="text" id="msg" placeholder="Enter message" required>
+            <button type="submit">send</button>
+        </form>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            const socket = io();
+            const chatForm = document.getElementById('chat-form');
+            const chat = document.getElementById('chat');
+            const userList = document.getElementById('users');
+            const msgInput = document.getElementById('msg');
+
+            const userName = prompt('Enter your name');
+            socket.emit('join', (userName)=>{
+                users.add(userName)
+                socket.userName = userName
+            });
+
+            socket.on('userJoined',(users)=>{
+                addmessage(`${users} joined the chat`);
+            });
+
+            socket.on('userLeft', (user)=>{
+                addmessage(`${user} has left the chat`)
+            })
+            socket.on('userList',(users) =>{
+                userList.innerHTML = '';
+                userList.innerHTML = users.map(user => `<li>${user}</li>`).join('');
+            });
+                // listen for chat message envent from the server
+
+                socket.on('chatMessage',(message) => {
+                    addmessage(`${message.userName} : ${message.text}`)
+                })
+
+
+            // handle form submission
+            chatForm.addEventListener('submit', (event)=>{
+                event.preventDefault()
+                extactMessageText = msgInput.value.trim()
+                if(extactMessageText){
+                    socket.emit('chatMessage',{
+                        userName, text : extactMessageText
+                    })
+                    msgInput.value='';
+                }
+            })
+
+            function addmessage(msg){
+                const messageElement = document.createElement('div');
+                messageElement.textContent = msg;
+                chat.appendChild(messageElement);
+
+                //scroll to bottom
+
+                chat.scrollTop = chat.scrollHeight;
+            }
+                
+        </script>
+</body>
+</html>
